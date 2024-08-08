@@ -2,17 +2,17 @@ Clean KO 코드 사용법
 
 
 
-*준비할 것: target_finder_1-3 코드, Knockout할 gene sequence (ec_alkB.dna), Knockout할 cell의 genome sequence (E. coli str. K-12 substr. W3110.dna)
+*준비할 것: snapgene_reader 및 biopython 라이브러리 설치, target_finder_1-3 코드, Knockout할 gene sequence (e.g. ec_alkB.dna), Knockout할 cell의 genome sequence (e.g. E. coli str. K-12 substr. W3110.dna)
 
 
 
 *각 코드의 기능은 다음과 같습니다.
 
-1. Knockout할 gene의 모든 NGG PAM sequence 앞 20개의 base를 따와 crRNA의 후보로 저장합니다. (input: ec_alkB.dna / output: alkB_target_1.xlsx)
+1. Knockout할 gene 내의 모든 NGG PAM sequence 앞 20개의 base를 따와 crRNA의 후보로 저장합니다. (input: ec_alkB.dna / output: alkB_target_1.xlsx)
 
-2. crRNA 후보 중 off-target이 있는 sequence를 제거합니다. (input: alkB_target_2.xlsx / output: alkB_target_3.xlsx)
+2. crRNA 후보 중 전체 genome에 off-target이 존재하는 sequence를 제거합니다. (input: alkB_target_2.xlsx / output: alkB_target_3.xlsx)
 
-3. 남은 crRNA 후보의 seed sequence를 추려내고 각각의 seed sequence에 대해 전체 genome에 off-target이 몇 개 존재하는지 나열해서 저장합니다. (input: E. coli str. K-12 substr. W3110.dna, alkB_target_3.xlsx / output: alkB_crRNA_final.xlsx)
+3. 남은 crRNA 후보에서 PAM에 가까운 10개의 base를 seed sequence를 추려내고 각각의 seed sequence에 대해 전체 genome에 off-target이 몇 개 존재하는지 나열해서 저장합니다. (input: E. coli str. K-12 substr. W3110.dna, alkB_target_3.xlsx / output: alkB_crRNA_final.xlsx)
 
 
 
@@ -20,14 +20,24 @@ Clean KO 코드 사용법
 
 1. knockout할 gene을 input으로 하여 target_finder_1 코드를 실행합니다.
 
-2. output으로 얻은 파일의 target 열을 복사하여 Cas-OFFinder (http://www.rgenome.net/cas-offinder/) 의 query sequence에 붙여넣고 해당하는 PAM과 Target Genome을 선택해서 Submit합니다.
+2. output으로 얻은 파일의 target 열을 복사하여 Cas-OFFinder (http://www.rgenome.net/cas-offinder/) 의 query sequence에 붙여넣고 해당하는 PAM (본 코드에서는 SpCas9의 5'-NRG-3'을 기준으로 함)과 Target Genome (본 코드에서는 Others>E. coli K-12를 기준으로 함)을 선택해서 Submit합니다.
 
-3. Download result를 클릭하여 결과 txt 파일을 저장합니다. (예시 폴더에서는 merge_with_target_1.txt로 이름을 변경하였습니다.)
+3. Download result를 클릭하여 결과 result.txt 파일을 저장합니다. (폴더에서는 merge_with_target_1.txt로 이름을 변경하였습니다.)
 
-4. 1.의 output으로 얻은 엑셀 파일 (alkB_target_1.xlsx) 에 3.의 결과를 붙여넣어 다음 코드에 넣을 엑셀 파일로 저장합니다. (alkB_target_2.xlsx)
+4. 1.의 output으로 얻은 엑셀 파일 (alkB_target_1.xlsx) 에 3.의 txt 결과 파일을 붙여넣어 다음 코드에 넣을 엑셀 파일로 저장합니다. (alkB_target_2.xlsx)
 
-5. 4.의 엑셀 파일을 input으로 하여 target_finder_2 코드를 실행합니다.
+5. target_finder_2 코드에서 knockout할 gene의 position 범위를 4.의 엑셀 파일을 참고하여 변경한 뒤 ("if ps > 2332937 or ps < 2332327:"의 숫자) 4.의 엑셀 파일을 input으로 하여 target_finder_2 코드를 실행합니다.
 
 6. output으로 얻은 엑셀 파일 (alkB_target_3.xlsx) 과 knockout할 cell의 genome 파일을 input으로 하여 target_finder_3 코드를 실행합니다.
 
 7. 최종 결과 파일 (alkB_crRNA_final.xlsx) 에서 off_target 값이 1인 (= off-target이 없는) sequence를 crRNA로 선택합니다. off_target 값이 1인 sequence가 없을 경우 값이 가장 작은 sequence 중 seed sequence의 off-target에 이웃한 PAM이 NGG인 경우를 최소화할 수 있는 sequence를 고릅니다.
+
+
+
+*참고 사항
+
+1. SpCas9 이외의 PAM이 다른 Cas9을 사용하는 경우 코드 조건문의 수정이 필요합니다.
+
+2. 코드 2에 input으로 넣을 엑셀 파일을 만들 때 column name이 1행에 정렬되어야 하니 꼭 확인해주세요.
+
+3. 코드 3의 전체 genome에서 PAM site를 찾아 저장하는 과정에 시간이 오래 소요되니 참고하시길 바랍니다.
